@@ -213,6 +213,9 @@ lista *separarPalavras(char frase[], lista *l)
                 while(aux->prox != NULL)  // Enquanto não chegar no final da lista
                     aux = aux->prox; // Vai para o próximo nó
                 
+                aux->prox = novaPalavra(" ");
+
+                aux = aux->prox;
                 aux->prox = novaPalavra(palavra); // Adiciona a nova palavra no final da lista  
             }
             j = 0;
@@ -230,15 +233,7 @@ lista *separarPalavras(char frase[], lista *l)
     return l;
 }
 
-// void inserirArvore(tree **raiz, registro *r) {
-//     tree *aux, *ant;
-//     registro *auxReg = r;
 
-//     if(*raiz == NULL) {
-//         *raiz = criaNo(auxReg->simbolo, auxReg->freq);
-//         auxReg = auxReg->prox;
-//     }
-// }
 // b) Uma lista (de registos) para armazenar: o símbolo, a palavra, a frequência e os códigos
 // de Huffman. Essa lista deverá ser gravada em arquivo em disco (arquivo binário).
 // Exemplo de frase para usar na construção da árvore de huffman (ignore a pontuação e
