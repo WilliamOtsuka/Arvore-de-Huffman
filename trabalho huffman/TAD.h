@@ -62,9 +62,52 @@ reg criarRegistro(int simbolo, char palavra[20], float freq, char codigo[50]) {
     strcpy(registro->palavra, palavra);
     registro->freq = freq;
     strcpy(registro->codigo, codigo);
+    registro->prox = NULL;
 
     return registro;
 }
+
+
+//Ordenar Lista de Registros por menor frequencia a maior
+void ordenarRegistro(Registro **reg) {
+    Registro *aux, *aux2;
+    char palavra[20];
+    float freq;
+    int simbolo;
+
+    aux = *reg;
+
+    while((*reg) != NULL) {
+        aux2 = (*reg)->prox; 
+
+        while(aux2 != NULL) {
+            if((*reg)->freq > aux2->freq) {
+                simbolo = (*reg)->simbolo;
+                strcpy(palavra, (*reg)->palavra);
+                freq = (*reg)->freq;
+
+                (*reg)->simbolo = aux2->simbolo;
+                strcpy((*reg)->palavra, aux2->palavra);
+                (*reg)->freq = aux2->freq;
+
+                aux2->simbolo = simbolo;
+                strcpy(aux2->palavra, palavra);
+                aux2->freq = freq;
+            }
+            aux2 = aux2->prox;
+        }
+        (*reg) = (*reg)->prox;
+    }
+
+    // Imprimir a lista de registros
+    *reg = aux;
+    aux = *reg;
+    while (aux != NULL) {
+        printf("%d %s %.2f %s\n", aux->simbolo, aux->palavra, aux->freq, aux->codigo);
+        aux = aux->prox;
+    }
+}
+
 
 // frequencia de cada palavra na Lista
 void frequencia(Lista *lista, Registro **reg) {
@@ -131,12 +174,14 @@ void frequencia(Lista *lista, Registro **reg) {
     }
 
     // Imprimir a lista de registros
-    auxReg = *reg;
+    // auxReg = *reg;
 
-    while (auxReg != NULL) {
-        printf("%d %s %.2f %s\n", auxReg->simbolo, auxReg->palavra, auxReg->freq, auxReg->codigo);
-        auxReg = auxReg->prox;
-    }
+    // while (auxReg != NULL) {
+    //     printf("%d %s %.2f %s\n", auxReg->simbolo, auxReg->palavra, auxReg->freq, auxReg->codigo);
+    //     auxReg = auxReg->prox;
+    // }
+
+    ordenarRegistro(&(*reg));
 }
 
 // Separar as palavras da frase em uma lista encadeada
