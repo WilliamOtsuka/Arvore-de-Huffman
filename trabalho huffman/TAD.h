@@ -33,6 +33,20 @@ struct Registro {
     struct Registro *prox;
 }; typedef struct Registro registro;  
 
+struct listafolhas {
+    tree *no;
+    struct listaFolhas *prox;
+}; typedef struct listafolhas listaFolha;
+
+// funcao pra criar uma nova folha
+listaFolha *novaFolha(tree *no) {
+    listaFolha *novo = (listaFolha*)malloc(sizeof(listaFolha));
+    novo->no = no;
+    novo->prox = NULL;
+
+    return novo;
+}
+
 // Nova Palavra
 lista *novaPalavra(char palavra[20])
 {
@@ -233,8 +247,36 @@ lista *separarPalavras(char frase[], lista *l)
     return l;
 }
 
+// void listaFolhas(listaFolha **l, registro *reg) 
+// {
+//     listaFolha *aux = *l;
+//     registro *auxReg = reg;
 
+//     while(auxReg != NULL) {
+//         if(*l == NULL) 
+//             *l = novaFolha(criaNo(auxReg->simbolo, auxReg->freq));
+
+//         else {
+//             aux = *l;
+
+//             while(aux->prox != NULL) {
+//                 aux = aux->prox;
+//             }
+//             aux->prox = novaFolha(criaNo(auxReg->simbolo, auxReg->freq));
+//         }
+//         auxReg = auxReg->prox;
+//     }
+
+//     // Imprimir a lista de folhas
+//     aux = *l;
+
+//     while (aux != NULL) {
+//         printf("%d %.2f\n", aux->no->simbolo, aux->no->freq);
+//         aux = aux->prox;
+//     }
+// }
 // b) Uma lista (de registos) para armazenar: o símbolo, a palavra, a frequência e os códigos
 // de Huffman. Essa lista deverá ser gravada em arquivo em disco (arquivo binário).
 // Exemplo de frase para usar na construção da árvore de huffman (ignore a pontuação e
 // tamanho da caixa dos caracteres!). Utilize frases com palavras repetidas!!!
+
