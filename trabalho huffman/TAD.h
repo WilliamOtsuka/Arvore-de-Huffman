@@ -12,269 +12,196 @@
 
 
 // Estrutura da árvore de Huffman
-struct Tree {
+struct arvore {
     char simbolo;
-    int freq;
-    struct Tree *esq, *dir;
-}; typedef struct Tree tree;
+    float frequencia;
+    struct arvore *esq;
+    struct arvore *dir;
+}; typedef struct arvore arvore;
 
-// Lista encadeada ordenada
-struct Lista {
-    char palavra[20];
-    struct Lista *prox;
-}; typedef struct Lista lista;
+// Estrutura da lista encadeada
+struct lista {
+    char palavra[50];
+    float frequencia;
+    struct lista *prox;
+}; typedef struct lista lista;
 
-// Registros para armazenar o símbolo, a palavra, a frequência e os códigos de Huffman
-struct Registro {
+// Estrutura do registro
+struct registro {
     int simbolo;
-    char palavra[20];
-    float freq;
+    char palavra[50];
+    float frequencia;
     char codigo[50];
-    struct Registro *prox;
-}; typedef struct Registro registro;  
+    struct registro *prox;
+}; typedef struct registro registro;
 
-struct listafolhas {
-    tree *no;
-    struct listaFolhas *prox;
-}; typedef struct listafolhas listaFolha;
-
-// funcao pra criar uma nova folha
-listaFolha *novaFolha(tree *no) {
-    listaFolha *novo = (listaFolha*)malloc(sizeof(listaFolha));
-    novo->no = no;
-    novo->prox = NULL;
-
-    return novo;
-}
-
-// Nova Palavra
-lista *novaPalavra(char palavra[20])
-{
+// Função para criar um novo nó
+lista* criarNo(char *palavra) {
     lista *novo = (lista*)malloc(sizeof(lista));
-    strcpy(novo->palavra, palavra); 
+    strcpy(novo->palavra, palavra);
+    novo->frequencia = 1;
     novo->prox = NULL;
 
     return novo;
 }
 
-// Função para criar um registro
-registro *criarRegistro(int simbolo, char palavra[20], float freq, char codigo[50]) {
-    registro *reg = (registro*) malloc(sizeof(registro));
-    reg->simbolo = simbolo;
-    strcpy(reg->palavra, palavra);
-    reg->freq = freq;
-    strcpy(reg->codigo, codigo);
-    reg->prox = NULL;
+// Função para adicionar uma palavra à lista
+void adicionarPalavra(lista **l, char *palavra) {
+    lista *atual = *l;
+    lista *anterior = NULL;
+    int encontrada = 0;
 
-    return reg;
-}
-
-//Criar um no da arvore
-tree *criaNo(char simbolo, int freq) {
-    tree *no = (tree*) malloc(sizeof(tree));
-    no->simbolo = simbolo;
-    no->freq = freq;
-    no->esq = NULL;
-    no->dir = NULL;
-
-    return no;
-}
-
-//Ordenar Lista de Registros por menor frequencia a maior
-registro *ordenarRegistro(registro *reg) {
-    Registro *aux, *aux2;
-    char palavra[20];
-    float freq;
-    int simbolo;
-
-    aux = reg;
-
-    while(reg != NULL) {
-        aux2 = reg->prox; 
-
-        while(aux2 != NULL) {
-            if(reg->freq > aux2->freq) {
-                simbolo = reg->simbolo;
-                strcpy(palavra, reg->palavra);
-                freq = reg->freq;
-
-                reg->simbolo = aux2->simbolo;
-                strcpy(reg->palavra, aux2->palavra);
-                reg->freq = aux2->freq;
-
-                aux2->simbolo = simbolo;
-                strcpy(aux2->palavra, palavra);
-                aux2->freq = freq;
-            }
-            aux2 = aux2->prox;
-        }
-        reg = reg->prox;
-    }
-
-    // Imprimir a lista de registros
-    reg = aux;
-    aux = reg;
-    while (aux != NULL) {
-        printf("%d %s %.2f %s\n", aux->simbolo, aux->palavra, aux->freq, aux->codigo);
-        aux = aux->prox;
-    }
-
-    return reg;
-}
-
-
-// frequencia de cada palavra na Lista
-registro *criarRegistro(lista *l, registro *reg) {
-    int palavras = 0, flag = 0, i = 1, j = 0, k = 0;
-    float freq;
-
-    lista *p = l, *verif = l, *aux = l;
-    registro *auxReg;
-
-    while(aux != NULL) { // Contar o número de palavras
-        palavras++;
-        aux = aux->prox;
-    }
-
-    aux = p;
-    freq = 0;
-
-    while(aux != NULL) { // Enquanto aux nao for nulo
-        if(strcmp(aux->palavra, p->palavra) == 0)  // Se a palavra for igual a palavra de p
-            freq++;
-
-        aux = aux->prox;
-    }
-
-    freq = freq / palavras; // Frequencia da palavra
-    reg = criarRegistro(i, p->palavra, freq, ""); 
-    i++;
-    j++;
-
-    auxReg = reg;
-    p = p->prox;
-
-    while (p != NULL) {
-        freq = 0;
-        verif = l;
-        flag = 0;
-        k = 0;
-
-        while (k < j && flag == 0){
-            if (strcmp(verif->palavra, p->palavra) == 0) 
-                flag++;
-
-            verif = verif->prox;
-            k++;
-        }
-
-        if (flag == 0) {
-            aux = p;
-
-            while(aux != NULL) {
-                if(strcmp(aux->palavra, p->palavra) == 0) 
-                    freq++;
-
-                aux = aux->prox;
-            }
-            freq = freq / palavras; // Frequencia da palavra
-            
-            auxReg->prox = criarRegistro(i, p->palavra, freq, "");
-            auxReg = auxReg->prox;
-            i++;
-        }
-        j++;
-        p = p->prox;
-    }
-
-    // Imprimir a lista de registros
-    // auxReg = reg;
-
-    // while (auxReg != NULL) {
-    //     printf("%d %s %.2f %s\n", auxReg->simbolo, auxReg->palavra, auxReg->freq, auxReg->codigo);
-    //     auxReg = auxReg->prox;
-    // }
-
-    reg = ordenarRegistro(reg);
-
-    return reg;
-}
-
-// Separar as palavras da frase em uma lista encadeada
-lista *separarPalavras(char frase[], lista *l) 
-{
-    int i = 0, j = 0, len = strlen(frase);
-    char palavra[20];
-
-    lista *aux;
-
-    while(i <= len) {
-        if(frase[i] != ' ') { // Se não for um espaço
-            palavra[j] = frase[i]; // Adiciona a letra na palavra
-            j++;
+    while (atual != NULL && !encontrada) {  // Verifica se a palavra já está na lista
+        if (strcmp(atual->palavra, palavra) == 0) {
+            atual->frequencia++;
+            encontrada = 1;
         } 
-        else { // Se for um espaço
-            palavra[j] = '\0'; // Adiciona o caractere de fim de string
+        else {
+            anterior = atual;
+            atual = atual->prox;
         }
+    }
+    if (!encontrada) {  // Se a palavra não estiver na lista, adiciona um novo nó
+        lista *novo = criarNo(palavra);
 
-        if(frase[i] == '\0' || frase[i] == ' ') {
-            if(l == NULL)  // Se a lista estiver vazia    
-                l = novaPalavra(palavra); // Cria uma nova palavra na lista
-            
-            else { // Se não
-                aux = l; // Cria um auxiliar para percorrer a lista
-                
-                while(aux->prox != NULL)  // Enquanto não chegar no final da lista
-                    aux = aux->prox; // Vai para o próximo nó
-                
-                aux->prox = novaPalavra(" ");
+        if (anterior == NULL) {
+            *l = novo;
+        }
+        else {
+            anterior->prox = novo;
+        }
+    }
+}
 
-                aux = aux->prox;
-                aux->prox = novaPalavra(palavra); // Adiciona a nova palavra no final da lista  
+// Função para separar as palavras da frase e adicionar à lista
+void separarPalavras(lista **l, char *frase) {
+    char palavra[50];
+    int i = 0, j = 0, k;
+
+    while (frase[i] != '\0') {
+        if (frase[i] == ' ') {
+            if (j > 0) {
+                palavra[j] = '\0';
+                
+                for (k = 0; k < j; k++) {   // Converte a palavra para minúsculas
+                    palavra[k] = tolower(palavra[k]);
+                }
+                adicionarPalavra(l, palavra);
+                j = 0;
             }
-            j = 0;
+            palavra[0] = ' ';
+            palavra[1] = '\0';
+            adicionarPalavra(l, palavra);
+        } 
+        else {
+            palavra[j++] = tolower(frase[i]);
         }
         i++;
     }
-    // Imprimir a lista de palavras
-    aux = l;
+    if (j > 0) {
+        palavra[j] = '\0';
 
-    while (aux != NULL) {
-        printf("%s\n", aux->palavra);
-        aux = aux->prox;
+        for (k = 0; k < j; k++) {   // Converte a palavra para minúsculas
+            palavra[k] = tolower(palavra[k]);
+        }
+        adicionarPalavra(l, palavra);
     }
-
-    return l;
 }
 
-// void listaFolhas(listaFolha **l, registro *reg) 
-// {
-//     listaFolha *aux = *l;
-//     registro *auxReg = reg;
+// Frequências das palavras
+void Frequencias(lista **l) {
+    lista *atual = *l;
+    int soma = 0;
 
-//     while(auxReg != NULL) {
-//         if(*l == NULL) 
-//             *l = novaFolha(criaNo(auxReg->simbolo, auxReg->freq));
+    while (atual != NULL) {
+        soma += atual->frequencia;
+        atual = atual->prox;
+    }
 
-//         else {
-//             aux = *l;
+    printf("Soma: %d\n", soma);
 
-//             while(aux->prox != NULL) {
-//                 aux = aux->prox;
-//             }
-//             aux->prox = novaFolha(criaNo(auxReg->simbolo, auxReg->freq));
-//         }
-//         auxReg = auxReg->prox;
-//     }
+    // Calcula a frequência de cada palavra
+    atual = *l;
+    while (atual != NULL) {
+        atual->frequencia = (atual->frequencia / soma) * 100;
+        atual = atual->prox;
+    }
+}
 
-//     // Imprimir a lista de folhas
-//     aux = *l;
+// Função para imprimir a lista
+void imprimirLista(lista *l) {
+    lista *atual = l;
 
-//     while (aux != NULL) {
-//         printf("%d %.2f\n", aux->no->simbolo, aux->no->freq);
-//         aux = aux->prox;
-//     }
-// }
+    printf("\nLista:\n");
+    while (atual != NULL) {
+        printf("Palavra: %s, Frequencia: %.2f\n", atual->palavra, atual->frequencia);
+        atual = atual->prox;
+    }
+}
+
+// Ordena a lista encadeada de registros
+
+    
+
+// Função para criar um registro
+registro* criarRegistro(lista *l) {
+    int simbolo = 1;
+    lista *atual = l;
+    registro *r = NULL;
+    registro *novo = NULL;
+
+    while (atual != NULL) {
+        novo = (registro*)malloc(sizeof(registro));
+        
+        if (strcmp(atual->palavra, " ") == 0) {
+            novo->simbolo = 0; //
+        } 
+        else {
+            novo->simbolo = simbolo++;
+        }
+
+        strcpy(novo->palavra, atual->palavra);
+        novo->frequencia = atual->frequencia;
+        novo->prox = NULL;
+
+        if (r == NULL) {
+            r = novo;
+        } 
+        else {
+            novo->prox = r;
+            r = novo;
+        }
+        atual = atual->prox;
+    }
+    ordenarRegistro(&r);
+
+    return r;
+}
+
+// Função para imprimir o registro
+void imprimirRegistro(registro *r) {
+    registro *atual = r;
+    printf("\nRegistro:\n");
+    while (atual != NULL) {
+        printf("Simbolo: %d, Palavra: %s, Frequencia: %.2f\n", atual->simbolo, atual->palavra, atual->frequencia);
+        atual = atual->prox;
+    }
+}
+
+// Criar No
+arvore* criarNoArvore(char simbolo, float frequencia) {
+    arvore *novo = (arvore*)malloc(sizeof(arvore));
+    novo->simbolo = simbolo;
+    novo->frequencia = frequencia;
+    novo->esq = NULL;
+    novo->dir = NULL;
+
+    return novo;
+}
+
+// Função para adicionar fazer
+
+
 // b) Uma lista (de registos) para armazenar: o símbolo, a palavra, a frequência e os códigos
 // de Huffman. Essa lista deverá ser gravada em arquivo em disco (arquivo binário).
 // Exemplo de frase para usar na construção da árvore de huffman (ignore a pontuação e
